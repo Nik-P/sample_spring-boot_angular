@@ -1,0 +1,17 @@
+.main-body{
+	background: wheat;
+	padding: 20px 30px 20px 30px;
+	-webkit-box-shadow: 0px 0px 10px rgba(0,0,0,.7);
+  -moz-box-shadow: 0px 0px 10px rgba(0,0,0,.7);
+  box-shadow: 0px 0px 10px rgba(0,0,0,.7);
+}
+
+@media (min-width: 992px)
+{
+	.column-offset-1 {
+	    margin-left: 8.33333333%;
+	}
+	.column-10 {
+	    width: 83.33333333%;
+	}
+}

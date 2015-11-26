@@ -1,3 +1,42 @@
+/*@import "compass"; */
 @import 'nav';
+@import 'menu';
+@import 'font-mixin';
+@import 'main-body';
+
+@include register-font('Comfortaa-Light');
+@include register-font('Comfortaa-Regular');
+
+@include register-font('Existence-Light');
+
+@include register-font('Sansation_Regular');
+@include register-font('Sansation_Light');
+
+ body:before { 
+  content: "";
+  position: fixed;
+  top: -10px;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  z-index: 100;
+  -webkit-box-shadow: 0px -1px 10px rgba(0,0,0,.7);
+  -moz-box-shadow: 0px -1px 10px rgba(0,0,0,.7);
+  box-shadow: 0px -1px 10px rgba(0,0,0,.7);
+} 
+
+body
+{
+    @include use-registered-font('Comfortaa-Regular');
+    /*background: #313130;*/
+    background-image: url("../img/background-experement2.png");
+}
+
+.sf-menu {
+	@include use-registered-font('Sansation_Regular');
+}
+
+html,body { min-height:100%; }
 
 /*li { font-size: 25px; };*/
+

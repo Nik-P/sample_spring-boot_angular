@@ -4,27 +4,76 @@
 <head>
 	<title>Spring Boot and Thymeleaf example</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-
-    <link rel="stylesheet" th:href="@{/css/main.min.css}"/>
-
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="webjars/bootstrap/3.3.5/css/bootstrap.min.css"/>
+
+    <link rel="stylesheet" th:href="@{/frontDependencies/superfish/css/superfish.css}"/>
+	<link rel="stylesheet" th:href="@{/css/main.min.css}"/>
+    <script th:src="@{/frontDependencies/superfish/js/jquery.js}"></script>
+	<script th:src="@{/frontDependencies/superfish/js/superfish.min.js}"></script>
+	<!--<script th:src="@{/frontDependencies/superfish/js/hoverIntent.js}"></script>-->
+	<script th:src="@{/js/main.js}"></script>
+
 </head>
-<body>
-<h3>Spring Boot and Thymeleaf</h3>
-<p>Hello World!</p>
-	<nav>
-		<ul>
+<body ng-app="booksApp" ng-controller="MainCtrl" >
+	<div class="column-10 column-offset-1">
+	<div id="menu" class="text-uppercase">
+		<ul class="main sf-menu">
 			<li>
-				hi
+				<a href="#">Home</a>
 			</li>
 			<li>
-				my
+				<a href="#">Book List</a>
+				<ul>
+					<li>
+						<a href="#">All Books</a>	
+					</li>
+					<li>
+						<a href="#">My Friend's Books</a>
+					</li>
+				</ul>
 			</li>
-			<li>name</li>
-			<li>i</li>
+			<li>
+				<a href="#">My library</a>
+				<ul>
+					<li>
+						<a href="#">My books</a>	
+					</li>
+					<li>
+						<a href="#">Pending requests</a>
+					</li>
+				</ul>
+			</li>
+			<li>
+				<a href="#">About</a>
+			</li>
+			<li>
+				<a href="#">FAQ</a>
+			</li>
 		</ul>
-	</nav>
-	<script th:src="@{/js/bundle.js}"></script>
+	</div>
+	</div>
+	
+	<div class="column-10 column-offset-1">
+	
+		<div class="main-body">
+			<h3>Spring Boot and Thymeleaf</h3>
+			<p>Hello World!</p>
+			{{test}}
+
+		</div>
+	
+	</div>
+	<script>
+
+		jQuery(document).ready(function() {
+			jQuery('ul.sf-menu').superfish({
+				delay:       350,                            // one second delay on mouseout
+				speed:       'slow',                          // faster animation speed
+				autoArrows:  false                            // disable generation of arrow mark-up
+			});
+		});
+
+	</script>
 </body>
 </html>
