@@ -1,8 +1,10 @@
 /*@import "compass"; */
 @import 'nav';
 @import 'menu';
+@import 'right-menu';
 @import 'font-mixin';
 @import 'main-body';
+@import 'swing-effect';
 
 @include register-font('Comfortaa-Light');
 @include register-font('Comfortaa-Regular');
@@ -24,6 +26,12 @@
   -moz-box-shadow: 0px -1px 10px rgba(0,0,0,.7);
   box-shadow: 0px -1px 10px rgba(0,0,0,.7);
 } 
+
+body, html {
+	height: 100%; 
+	margin: 0px; 
+	padding: 0px; 
+}
 
 body
 {

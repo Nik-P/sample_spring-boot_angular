@@ -5,7 +5,9 @@
 	<title>Spring Boot and Thymeleaf example</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="webjars/bootstrap/3.3.5/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" ></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
 
     <link rel="stylesheet" th:href="@{/frontDependencies/superfish/css/superfish.css}"/>
 	<link rel="stylesheet" th:href="@{/css/main.min.css}"/>
@@ -17,41 +19,99 @@
 </head>
 <body ng-app="booksApp" ng-controller="MainCtrl" >
 	<div class="column-10 column-offset-1">
-	<div id="menu" class="text-uppercase">
-		<ul class="main sf-menu">
-			<li>
-				<a href="#">Home</a>
-			</li>
-			<li>
-				<a href="#">Book List</a>
-				<ul>
-					<li>
-						<a href="#">All Books</a>	
-					</li>
-					<li>
-						<a href="#">My Friend's Books</a>
-					</li>
-				</ul>
-			</li>
-			<li>
-				<a href="#">My library</a>
-				<ul>
-					<li>
-						<a href="#">My books</a>	
-					</li>
-					<li>
-						<a href="#">Pending requests</a>
-					</li>
-				</ul>
-			</li>
-			<li>
-				<a href="#">About</a>
-			</li>
-			<li>
-				<a href="#">FAQ</a>
-			</li>
-		</ul>
-	</div>
+		<div id="left-menu" class="text-uppercase">
+			<ul id="left" class="main sf-menu">
+				<li>
+					<a href="#">Home</a>
+				</li>
+				<li>
+					<a href="#">Book List</a>
+					<ul>
+						<li>
+							<a href="#">All Books</a>	
+						</li>
+						<li>
+							<a href="#">My Friend's Books</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="#">My library</a>
+					<ul>
+						<li>
+							<a href="#">My books</a>	
+						</li>
+						<li>
+							<a href="#">Pending requests</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="#">My Account</a>
+					<ul>
+						<li>
+							<a href="#">Profile</a>	
+						</li>
+						<li>
+							<a href="#">Friends</a>
+						</li>
+						<li>
+							<a href="#">Messages</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<a href="#">About</a>
+					<ul>
+						<li>
+							<a href="#">FAQ</a>
+						</li>
+						<li>
+							<a href="#">Contact Us</a>
+						</li>
+					</ul>
+				</li>
+				<li id="right">
+					<a href="#"><i class="fa fa-user"></i></a>
+					<ul>
+						<li>
+							<a href="#">Login</a>
+						</li>
+						<li>
+							<a href="#">Register</a>
+						</li>
+						<li>
+							<a class="swing" href="#"><i class="fa fa-bell"></i></a>
+						</li>
+						<li>
+							<a href="#"><i class="fa fa-sign-out"></i></a>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		<script type="text/javascript">
+			(function($){
+				$(document).ready(function(){
+					console.log("Hello jquery");
+					var login = $("#right");
+					console.log(login.offset().left + " Offset left");
+					var w = $(window);
+					var navListPadding = $("#left").css("padding-left").replace("px", "");
+					console.log(navListPadding + " Offset left");
+					var right = w.width() - login.outerWidth() - login.offset().left - (w.width()-83.33333333/100*w.width())/2 - navListPadding;
+					console.log(right + " right");
+					$("#right").css("margin-left",right);
+				});
+			})(jQuery);
+		</script>
+		<!--<div id="right-menu">
+			<ul id="right" class="sf-menu">
+				<li>
+					<a href="#">Home</a>
+				</li>
+			</ul>
+		</div>-->
 	</div>
 	
 	<div class="column-10 column-offset-1">
