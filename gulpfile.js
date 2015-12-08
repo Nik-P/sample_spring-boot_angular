@@ -2,6 +2,9 @@ var gulp = require('gulp'),
     autoprefixer = require('gulp-autoprefixer'),
     del = require('del'),
     browserify = require('browserify'),
+    /*ngHtml2Js = require('browserify-ng-html2js'),*/
+    html2js = require('gulp-html2js'),
+    ngAnnotate = require('gulp-ng-annotate'),
     /*browserify = require('gulp-browserify'),*/
     cache = require('gulp-cache'),
     concat = require('gulp-concat'),
@@ -45,16 +48,36 @@ gulp.task('hint', function() {
     .pipe(notify({ message: 'hint task complete' }));*/
 });
 
+gulp.task('templates', function () {
+    gulp.src('front_end_src/main/js/**/*.html')
+        .pipe(html2js({
+            outputModuleName: 'templates',
+            useStrict: true,
+            target: 'js'
+        }))
+        .pipe(concat('template.js'))
+        .pipe(gulp.dest('src/main/resources/static/js'))
+})
+
 gulp.task('browserify', function() {
   return browserify({
       entries: './front_end_src/main/js/main.js',
       debug: true,
       // defining transforms here will avoid crashing your stream
-      //transform: [reactify]
+      //transform: ['browserify-ng-html2js']
     })
+    /*.transform(ngHtml2Js({
+      module: 'testit', // optional module name
+      extension: 'html', // optionally specify what file types to look for
+      baseDir: 'front_end_src/main/js', // optionally specify base directory for filename
+      prefix: '', // optionally specify a prefix to be added to the filename,
+      requireAngular: false // (default: false) optionally include `var angular = require('angular');` 
+                            // Supported in Angular 1.3.14 and above if you bundle angular with browserify
+    }))*/
     .bundle()
     .pipe(source('main.js'))
     .pipe(buffer(sourcemaps.init({loadMaps: true})))
+    .pipe(ngAnnotate({ add: true }))
     .pipe(uglify())
     .pipe(size())
     .on('error', gUtils.log)
@@ -76,7 +99,7 @@ gulp.task('clean', function(cb) {
 gulp.task('default', ['clean'], function(cb) {
   runSequence(
     'styles',
-    ['hint', 'browserify', 'images'],
+    ['hint', 'templates', 'browserify', 'images'],
     cb
   );
 });

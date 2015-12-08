@@ -6,16 +6,17 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" ></script>
+    <script th:src="@{/frontDependencies/superfish/js/jquery.js}"></script>
+	<script th:src="@{/js/main.js}"></script>
+	<script th:src="@{/js/template.js}"></script>
+	<script th:src="@{/frontDependencies/superfish/js/superfish.min.js}"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" ></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
 
     <link rel="stylesheet" th:href="@{/frontDependencies/superfish/css/superfish.css}"/>
 	<link rel="stylesheet" th:href="@{/css/main.min.css}"/>
-    <script th:src="@{/frontDependencies/superfish/js/jquery.js}"></script>
-	<script th:src="@{/frontDependencies/superfish/js/superfish.min.js}"></script>
-	<!--<script th:src="@{/frontDependencies/superfish/js/hoverIntent.js}"></script>-->
-	<script th:src="@{/js/main.js}"></script>
-
+   <!--<script th:src="@{/frontDependencies/superfish/js/hoverIntent.js}"></script>-->
+	
 </head>
 <body ng-app="booksApp" ng-controller="MainCtrl" >
 	<div class="column-10 column-offset-1">
