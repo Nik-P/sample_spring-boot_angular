@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html SYSTEM "about:legacy-compat">
 <html xmlns="http://www.w3.org/1999/xhtml"
  xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
     <script th:src="@{/frontDependencies/superfish/js/jquery.js}"></script>
 	<script th:src="@{/js/main.js}"></script>
+	<script src="https://code.angularjs.org/1.4.8/angular-resource.min.js"></script>
 	<script th:src="@{/js/template.js}"></script>
 	<script th:src="@{/frontDependencies/superfish/js/superfish.min.js}"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" ></script>
@@ -22,39 +23,39 @@
 	<div class="column-10 column-offset-1">
 		<div id="left-menu" class="text-uppercase">
 			<ul id="left" class="main sf-menu">
-				<li>
-					<a href="#">Home</a>
+				<li ui-sref-active="active">
+					<a href ui-sref="home">Home</a>
 				</li>
 				<li>
-					<a href="#">Book List</a>
+					<a href ui-sref="books({view: 'all'})">Book List</a>
 					<ul>
 						<li>
-							<a href="#">All Books</a>	
+							<a href ui-sref="books({view: 'all'})">All Books</a>	
 						</li>
 						<li>
-							<a href="#">My Friend's Books</a>
+							<a href ui-sref="books({view: 'friends'})">My Friend's Books</a>
 						</li>
 					</ul>
 				</li>
 				<li>
-					<a href="#">My library</a>
+					<a href ui-sref="books({view: 'my_books'})">My library</a>
 					<ul>
 						<li>
-							<a href="#">My books</a>	
+							<a href ui-sref="books({view: 'my_books'})">My books</a>	
 						</li>
 						<li>
-							<a href="#">Pending requests</a>
+							<a href ui-sref="books({view: 'my_book_requests'})">Pending requests</a>
 						</li>
 					</ul>
 				</li>
 				<li>
-					<a href="#">My Account</a>
+					<a href ui-sref="user">My Account</a>
 					<ul>
 						<li>
-							<a href="#">Profile</a>	
+							<a href ui-sref="user">Profile</a>	
 						</li>
 						<li>
-							<a href="#">Friends</a>
+							<a href ui-sref="friends">Friends</a>
 						</li>
 						<li>
 							<a href="#">Messages</a>
@@ -117,7 +118,11 @@
 	
 	<div class="column-10 column-offset-1">
 	
+
+		
 		<div class="main-body">
+			<div ui-view="main"></div>
+	
 			<h3>Spring Boot and Thymeleaf</h3>
 			<p>Hello World!</p>
 			{{test}}

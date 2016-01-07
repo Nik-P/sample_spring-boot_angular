@@ -53,15 +53,22 @@ gulp.task('templates', function () {
         .pipe(html2js({
             outputModuleName: 'templates',
             useStrict: true,
-            target: 'js'
         }))
         .pipe(concat('template.js'))
         .pipe(gulp.dest('src/main/resources/static/js'))
 })
 
-gulp.task('browserify', function() {
+gulp.task('concat-js', function() {
+  return gulp.src(['front_end_src/main/js/**/*module.js', 'front_end_src/main/js/**/*.js'])
+    .pipe(concat('main.js'))
+    .pipe(gulp.dest('front_end_src/main/temp'));
+})
+
+gulp.task('browserify', ['concat-js'], function() {
+  //gulp.start('concat-js');
+
   return browserify({
-      entries: './front_end_src/main/js/main.js',
+      entries: './front_end_src/main/temp/main.js',
       debug: true,
       // defining transforms here will avoid crashing your stream
       //transform: ['browserify-ng-html2js']
@@ -78,11 +85,11 @@ gulp.task('browserify', function() {
     .pipe(source('main.js'))
     .pipe(buffer(sourcemaps.init({loadMaps: true})))
     .pipe(ngAnnotate({ add: true }))
-    .pipe(uglify())
+    //.pipe(uglify())
     .pipe(size())
     .on('error', gUtils.log)
-    .pipe(gulp.dest('src/main/resources/static/js'))
-    .pipe(notify({ message: 'Browserify task complete' }));
+    .pipe(gulp.dest('src/main/resources/static/js'));
+    /*.pipe(notify({ message: 'Browserify task complete' }));*/
 });
 
 gulp.task('images', function() {
@@ -110,6 +117,9 @@ gulp.task('watch', ['default'], function() {
 
   // Watch .js files
   gulp.watch('front_end_src/main/js/**/*.js', ['hint','browserify']);
+
+  // Watch .html partials
+  gulp.watch('front_end_src/main/js/**/*.html', ['templates']);
 
   // Watch image files
   gulp.watch('front_end_src/main/images/**/*', ['images']);

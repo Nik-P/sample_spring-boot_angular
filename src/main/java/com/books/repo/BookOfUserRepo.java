@@ -4,6 +4,8 @@ import com.books.entity.BookOfUser;
 import java.util.List;
 import java.util.Optional;
 import javax.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 //import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -15,6 +17,8 @@ import org.springframework.data.repository.query.Param;
 public interface BookOfUserRepo extends PagingAndSortingRepository<BookOfUser, Long> {
 
     Optional<BookOfUser> findById(@Param("id") Long id);
+    
+    Page<BookOfUser> findAll(Pageable pageable);
     
     List<BookOfUser> findByUserEmail(@Param("email") String email);
     

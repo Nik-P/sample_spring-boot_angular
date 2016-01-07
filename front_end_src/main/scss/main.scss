@@ -9,6 +9,8 @@
 @include register-font('Comfortaa-Light');
 @include register-font('Comfortaa-Regular');
 
+@include register-font('FiraSans-Regular');
+
 @include register-font('Existence-Light');
 
 @include register-font('Sansation_Regular');
@@ -35,7 +37,7 @@ body, html {
 
 body
 {
-    @include use-registered-font('Comfortaa-Regular');
+    @include use-registered-font('FiraSans-Regular');
     /*background: #313130;*/
     background-image: url("../img/background-experement2.png");
 }

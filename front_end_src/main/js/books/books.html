@@ -1,0 +1,39 @@
+	<h1 ng-init="model.initBooks()">{{model.test}}</h1>
+	<br/>
+	<table class="table table-hover table-condensed">
+		<thead ng-show="model.view==='all'">
+			<tr>
+				<th>Id</th>
+				<th>Title</th>
+				<th>Isbn</th>
+			</tr>
+		</thead>
+		<thead ng-show="model.view==='friends' || model.view==='my_books'">
+			<tr>
+				<th>Id</th>
+				<th>Email</th>
+				<th>Isbn</th>
+			</tr>
+		</thead>
+		<tbody ng-show="model.view==='all'">
+			<tr ng-repeat="book in model.books">
+				<td>{{book.id}}</td>
+				<td>{{book.title}}</td>
+				<td>{{book.isbn}}</td>
+			</tr>
+		</tbody>
+		<tbody ng-show="model.view==='friends' || model.view==='my_books'">
+			<tr ng-repeat="book in model.books">
+				<td>{{book.id}}</td>
+				<td>{{book.user.email}}</td>
+				<td>{{book.book.isbn}}</td>
+			</tr>
+		</tbody>
+		<tbody ng-show="model.view==='my_book_requests'">
+			<tr ng-repeat="book in model.books">
+				<td>{{book.id}}</td>
+				<td>{{book.owner.email}}</td>
+				<td>{{book.book.isbn}}</td>
+			</tr>
+		</tbody>
+	</table>

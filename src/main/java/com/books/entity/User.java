@@ -28,7 +28,15 @@ public class User extends StartEntity {
     @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY ,mappedBy = "user")
     private Set<BookOfUser> userbook = new HashSet<>();
-
+    
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY ,mappedBy = "user")
+    private Set<UserFriend> user = new HashSet<>();
+    
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY ,mappedBy = "friend")
+    private Set<UserFriend> friend = new HashSet<>();
+    
     @Column(unique=true, nullable=false)
     @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\."
         +"[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@"
@@ -128,6 +136,34 @@ public class User extends StartEntity {
      */
     public void setTelephone(String telephone) {
         this.telephone = telephone;
+    }
+
+    /**
+     * @return the user
+     */
+    public Set<UserFriend> getUser() {
+        return user;
+    }
+
+    /**
+     * @param user the user to set
+     */
+    public void setUser(Set<UserFriend> user) {
+        this.user = user;
+    }
+
+    /**
+     * @return the friend
+     */
+    public Set<UserFriend> getFriend() {
+        return friend;
+    }
+
+    /**
+     * @param friend the friend to set
+     */
+    public void setFriend(Set<UserFriend> friend) {
+        this.friend = friend;
     }
 
 }

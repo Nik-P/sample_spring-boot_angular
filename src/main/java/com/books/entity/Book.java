@@ -1,18 +1,27 @@
 package com.books.entity;
 
 import com.books.entity.helpers.StartEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Pattern;
 
 @Entity
 public class Book extends StartEntity{
 
+    @JsonIgnore
+    @OneToMany(fetch = FetchType.LAZY ,mappedBy = "book")
+    private Set<BookOfUser> userbook = new HashSet<>();
+    
     private String author;
 
     private String title;
@@ -215,5 +224,19 @@ public class Book extends StartEntity{
      */
     public void setOriginalLanguage(String originalLanguage) {
         this.originalLanguage = originalLanguage;
+    }
+
+    /**
+     * @return the userbook
+     */
+    public Set<BookOfUser> getUserbook() {
+        return userbook;
+    }
+
+    /**
+     * @param userbook the userbook to set
+     */
+    public void setUserbook(Set<BookOfUser> userbook) {
+        this.userbook = userbook;
     }
 }

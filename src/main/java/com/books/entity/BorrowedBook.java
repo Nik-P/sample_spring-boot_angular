@@ -32,6 +32,8 @@ public class BorrowedBook extends StartEntity {
     private Date dateBorrowed;
     private boolean returned;
     private Date dateReturned;
+    
+    private String comment;
 
     protected BorrowedBook(){
         
@@ -129,5 +131,19 @@ public class BorrowedBook extends StartEntity {
      */
     public void setReturned(boolean returned) {
         this.returned = returned;
+    }
+
+    /**
+     * @return the comment
+     */
+    public String getComment() {
+        return comment;
+    }
+
+    /**
+     * @param comment the comment to set
+     */
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

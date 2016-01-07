@@ -9,6 +9,7 @@ import com.books.repo.UserFriendRepo;
 import com.books.repo.UserRepo;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -56,9 +58,13 @@ public class BookController {
     }
     
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<?> getAllBooks() {
-        
-        return new ResponseEntity<Object>(bookRepo.findAll(), new HttpHeaders(), HttpStatus.OK);
+    public ResponseEntity<?> getAllBooks(@RequestParam(value = "limit", required=false, defaultValue = "10") int limit, @RequestParam(value = "page", required=false,  defaultValue = "0") int page) {
+        if(limit < 0){
+            return new ResponseEntity<Object>(bookRepo.findAll(), new HttpHeaders(), HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<Object>(bookRepo.findAll(new PageRequest(page, limit)), new HttpHeaders(), HttpStatus.OK);
+        }
     }
     
     @RequestMapping(method = RequestMethod.GET, value = "/{bookId}")

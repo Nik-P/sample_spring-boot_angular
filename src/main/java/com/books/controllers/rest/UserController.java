@@ -19,6 +19,7 @@ import com.books.repo.BorrowedBookRepo;
 import com.books.repo.UserFriendRepo;
 import com.books.repo.UserRepo;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -96,12 +98,22 @@ public class UserController {
     /*----------------------*/
     
     @RequestMapping(method = RequestMethod.GET, value = "/{userId}/books")
-    public ResponseEntity<?> findUserBooks(@PathVariable Long userId/*, @RequestBody Book input*/) {
+    public ResponseEntity<?> findUserBooks(@PathVariable Long userId , 
+        @RequestParam(value = "limit", required=false, defaultValue = "10") int limit, 
+        @RequestParam(value = "page", required=false, defaultValue = "0") int page,
+        @RequestParam(value = "view", required=false, defaultValue = "") String view) {
 
         this.validateUser(userId);
-        //bookRepo.save(new Book());
-        //return userRepo.findById(userId);
-        return new ResponseEntity<Object>(bookOfUserRepo.findByUserId(userId), new HttpHeaders(), HttpStatus.OK);
+        if(view.isEmpty() || view.equals("friends")){
+            return new ResponseEntity<Object>(bookRepo.findByUserFriends(userId), new HttpHeaders(), HttpStatus.OK);
+        }
+        else if(view.equals("friends-available")){
+            return new ResponseEntity<Object>(bookRepo.findByUserFriendsWithAvailability(userId), new HttpHeaders(), HttpStatus.OK);
+            //return new ResponseEntity<Object>(bookRepo.findByUserFriends(userId), new HttpHeaders(), HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<Object>(bookOfUserRepo.findByUserId(userId), new HttpHeaders(), HttpStatus.OK);
+        }
     }
     
     @RequestMapping(method = RequestMethod.GET, value = "/{userId}/books/{bookId}")
@@ -241,6 +253,58 @@ public class UserController {
     /*----------------------*/
     /*-----------    BorrowedBook Segment    -----------*/
     /*----------------------*/
+    
+    /* user lents to others, the requests that have not been accepted yet */
+    @RequestMapping(method = RequestMethod.GET, value = "/{userId}/lent")
+    public ResponseEntity<?> getOtherUsersActiveBorrowRequests(@PathVariable Long userId) {
+        
+        /* Check if there is an open lend request for the book by the borrowing user */
+        
+        //borrowedBookRepo.findByBorrowerIdAndBookId(userId, bookId);
+        //this.validateBorrowedBook(userId, bookId);
+        List<BorrowedBook> temp;
+        temp = borrowedBookRepo.findByOwnerIdAndReturnedAndDateBorrowedNull(userId,false);
+        if(temp.isEmpty())
+        {
+            return new ResponseEntity<Object>("No active borrow request found!", new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        }
+        
+        return new ResponseEntity<Object>(temp, new HttpHeaders(), HttpStatus.OK);
+    }
+    
+    /* user borrows from others, the requests that have not been accepted yet */
+    @RequestMapping(method = RequestMethod.GET, value = "/{userId}/borrow")
+    public ResponseEntity<?> getUsersActiveBorrowRequests(@PathVariable Long userId) {
+        
+        /* Check if there is an open lend request for the book by the borrowing user */
+        
+        //borrowedBookRepo.findByBorrowerIdAndBookId(userId, bookId);
+        //this.validateBorrowedBook(userId, bookId);
+        List<BorrowedBook> temp;
+        temp = borrowedBookRepo.findByBorrowerIdAndReturnedAndDateBorrowedNull(userId,false);
+        if(temp.isEmpty())
+        {
+            return new ResponseEntity<Object>("No active borrow request found!", new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        }
+        
+        return new ResponseEntity<Object>(temp, new HttpHeaders(), HttpStatus.OK);
+    }
+    
+    /* user borrows from and lents to others, the requests that have not been accepted yet */
+    @RequestMapping(method = RequestMethod.GET, value = "/{userId}/borrow-lent")
+    public ResponseEntity<?> getUsersAndFriendsActiveBorrowRequests(@PathVariable Long userId) {
+        
+        /* Check if there is an open lend request for the book by the borrowing user */
+        
+        List<BorrowedBook> temp;
+        temp = borrowedBookRepo.findByOwnerIdAndReturnedAndDateBorrowedNullOrBorrowerIdAndReturnedAndDateBorrowedNull(userId, false, userId,false);
+        if(temp.isEmpty())
+        {
+            return new ResponseEntity<Object>("No active borrow request found!", new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        }
+        
+        return new ResponseEntity<Object>(temp, new HttpHeaders(), HttpStatus.OK);
+    }
     
     @RequestMapping(method = RequestMethod.GET, value = "/{userId}/borrow/{bookId}")
     public ResponseEntity<?> getActiveBorrowRequest(@PathVariable Long userId, @PathVariable Long bookId) {
