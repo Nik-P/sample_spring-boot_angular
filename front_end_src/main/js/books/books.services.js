@@ -29,6 +29,19 @@ angular.module('booksApp.books')
             });
         };
 
+        /*All outcoming and incoming requests*/
+        service.getAllBorrowRequests = function(id ,success, failure) {
+            var temp = $resource('users/'+id+'/borrow-lent',
+            {},
+            {'query': {method: 'GET', isArray: true, headers:{'Content-Type':'charset=UTF-8'} }});
+            var data = temp.query();
+            data.$promise.then( function() {
+                //var books = data.content;
+                success( data );
+            });
+        };
+
+        /*
         service.getMyBorrowRequests = function(id ,success, failure) {
             var temp = $resource('users/'+id+'/borrow',
             {},
@@ -39,6 +52,7 @@ angular.module('booksApp.books')
                 success( data );
             });
         };
+        */
 
         service.getFriendsBooks = function(id ,success, failure) {
             var temp = $resource('users/'+id+'/books?view=friends-available',

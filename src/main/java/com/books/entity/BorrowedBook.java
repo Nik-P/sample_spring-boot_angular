@@ -39,7 +39,21 @@ public class BorrowedBook extends StartEntity {
         
     }
     
+    public BorrowedBook(BorrowedBook info){
+        
+    }
+    
     public BorrowedBook(User borrower, BookOfUser book){
+        this.borrower = borrower;
+        this.owner = book.getUser();
+        this.dateBorrowed = null;
+        this.dateReturned = null;
+        this.returned = false;
+        //this.accepted = false;
+        this.book = book;
+    }
+    
+    public void update(User borrower, BookOfUser book){
         this.borrower = borrower;
         this.owner = book.getUser();
         this.dateBorrowed = null;

@@ -16,10 +16,14 @@ angular.module('booksApp',
 	'booksApp.home',
 	'booksApp.books',
 	'booksApp.user',
+	'booksApp.login',
 	'booksApp.friends']);
 
-  angular.module('booksApp').config(function ($stateProvider, $urlRouterProvider) {
+  angular.module('booksApp').config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
       $urlRouterProvider.otherwise('/home');
+
+      /*--- Deprecated Security ---*/
+      $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
   });
 
 
@@ -37,8 +41,16 @@ angular.module('booksApp',
             $scope.pageTitle = toState.data.pageTitle + ' | Book' ;
         }
     });
-	}
 
+    $scope.logout = function() {
+		  $http.post('logout', {}).success(function() {
+		    $rootScope.authenticated = false;
+		    $location.path("/");
+		  }).error(function(data) {
+		    $rootScope.authenticated = false;
+		  });
+		}
+	}
 	/* @ngInject */
 	angular.module('booksApp').controller('MainCtrl', ['$scope', MainCtrl]);
 

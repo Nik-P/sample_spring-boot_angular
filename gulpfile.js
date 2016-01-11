@@ -29,15 +29,15 @@ gulp.task('styles', function() {
     .pipe(gulp.dest('src/main/resources/static/css'))
     .pipe(rename({suffix: '.min'}))
     .pipe(minifycss())
-    .pipe(gulp.dest('src/main/resources/static/css'))
-    .pipe(notify({ message: 'Styles task complete' }));
+    .pipe(gulp.dest('src/main/resources/static/css'));
+    //.pipe(notify({ message: 'Styles task complete' }));
 });
 
 gulp.task('hint', function() {
   return gulp.src('front_end_src/main/js/**/*.js')
     .pipe(jshint('.jshintrc'))
-    .pipe(jshint.reporter('default'))
-    .pipe(notify({ message: 'hint task complete' }));
+    .pipe(jshint.reporter('default'));
+    //.pipe(notify({ message: 'hint task complete' }));
 
     /*--- Without Browserify ---*/
     /*.pipe(concat('main.js'))

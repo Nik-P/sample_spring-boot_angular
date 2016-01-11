@@ -22,8 +22,8 @@
                     model.getUserBooks(1);
                 }
                 else if(model.view === 'my_book_requests'){
-                    model.getFriendBorrowRequests(1);
-                    /*model.getBorrowRequests(1);*/
+                    model.getAllBorrowRequests(1);
+                    /*model.getMyBorrowRequests(1);*/
                 }
                 else{
                     model.getAllBooks();
@@ -41,7 +41,18 @@
                 });
             };
 
-            model.getMyBorrowRequests = function(id){
+            model.getAllBorrowRequests = function(id){
+                BookService.getAllBorrowRequests(id,
+                function(books){
+                    console.log('Retrieved my borrow Requests');
+                    model.books = books;
+                },
+                function(){
+                    alert('Error retrieving borrow requests');
+                });
+            };
+
+            /*model.getMyBorrowRequests = function(id){
                 BookService.getMyBorrowRequests(id,
                 function(books){
                     console.log('Retrieved my Borrow Requests');
@@ -61,7 +72,7 @@
                 function(){
                     alert('Error retrieving borrow requests');
                 });
-            };
+            };*/
 
             model.getFriendsBooks = function(id){
                 BookService.getFriendsBooks(id,

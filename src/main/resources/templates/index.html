@@ -118,8 +118,20 @@
 	
 	<div class="column-10 column-offset-1">
 	
+	<!--<h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
+        <form th:action="@{/logout}" method="post">
+            <input type="submit" value="Sign Out"/>
+        </form>-->
+		<a href ui-sref="login">login</a>
+		<div ng-show="authenticated">
+			<p>The ID is {{greeting.id}}</p>
+			<p>The content is {{greeting.content}}</p>
+		</div>
+		<div  ng-show="!authenticated">
+			<p>Login to see your greeting</p>
+		</div>
 
-		
+
 		<div class="main-body">
 			<div ui-view="main"></div>
 	

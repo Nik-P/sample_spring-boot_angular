@@ -16,10 +16,14 @@ angular.module('booksApp',
 	'booksApp.home',
 	'booksApp.books',
 	'booksApp.user',
+	'booksApp.login',
 	'booksApp.friends']);
 
-  angular.module('booksApp').config(function ($stateProvider, $urlRouterProvider) {
+  angular.module('booksApp').config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
       $urlRouterProvider.otherwise('/home');
+
+      /*--- Deprecated Security ---*/
+      $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
   });
 
 
@@ -37,8 +41,16 @@ angular.module('booksApp',
             $scope.pageTitle = toState.data.pageTitle + ' | Book' ;
         }
     });
-	}
 
+    $scope.logout = function() {
+		  $http.post('logout', {}).success(function() {
+		    $rootScope.authenticated = false;
+		    $location.path("/");
+		  }).error(function(data) {
+		    $rootScope.authenticated = false;
+		  });
+		}
+	}
 	/* @ngInject */
 	angular.module('booksApp').controller('MainCtrl', ['$scope', MainCtrl]);
 
@@ -104,6 +116,25 @@ angular.module('booksApp.home',
 'use strict';
 
 /* @ngInject */
+angular.module('booksApp.login', 
+[]
+)
+
+.config(function ($stateProvider) {
+    $stateProvider.state('login', {
+        url: '/login',
+        views: {
+            'main': {
+                controller: 'LoginCtrl as model',
+                templateUrl: 'front_end_src/main/js/login/login.html'
+            }
+        },
+        data:{ pageTitle: 'Login' }
+    });
+});
+'use strict';
+
+/* @ngInject */
 angular.module('booksApp.user', 
 []
 )
@@ -117,7 +148,7 @@ angular.module('booksApp.user',
                 templateUrl: 'front_end_src/main/js/user/user.html'
             }
         },
-        data:{ pageTitle: 'Home' }
+        data:{ pageTitle: 'Profile' }
     });
 });
 'use strict';
@@ -144,8 +175,8 @@ angular.module('booksApp.user',
                     model.getUserBooks(1);
                 }
                 else if(model.view === 'my_book_requests'){
-                    model.getBorrowRequests(1);
-                    /*model.getBorrowRequests(1);*/
+                    model.getAllBorrowRequests(1);
+                    /*model.getMyBorrowRequests(1);*/
                 }
                 else{
                     model.getAllBooks();
@@ -163,16 +194,38 @@ angular.module('booksApp.user',
                 });
             };
 
-           model.getBorrowRequests = function(id){
-                BookService.getBorrowRequests(id,
+            model.getAllBorrowRequests = function(id){
+                BookService.getAllBorrowRequests(id,
                 function(books){
-                    console.log('Retrieved Borrow Requests');
+                    console.log('Retrieved my borrow Requests');
                     model.books = books;
                 },
                 function(){
                     alert('Error retrieving borrow requests');
                 });
             };
+
+            /*model.getMyBorrowRequests = function(id){
+                BookService.getMyBorrowRequests(id,
+                function(books){
+                    console.log('Retrieved my Borrow Requests');
+                    model.books = books;
+                },
+                function(){
+                    alert('Error retrieving borrow requests');
+                });
+            };
+
+           model.getFriendBorrowRequests = function(id){
+                BookService.getFriendBorrowRequests(id,
+                function(books){
+                    console.log('Retrieved my friends Borrow Requests');
+                    model.books = books;
+                },
+                function(){
+                    alert('Error retrieving borrow requests');
+                });
+            };*/
 
             model.getFriendsBooks = function(id){
                 BookService.getFriendsBooks(id,
@@ -224,7 +277,31 @@ angular.module('booksApp.books')
             });
         };
 
-        service.getBorrowRequests = function(id ,success, failure) {
+        service.getFriendBorrowRequests = function(id ,success, failure) {
+            var temp = $resource('users/'+id+'/lent',
+            {},
+            {'query': {method: 'GET', isArray: true, headers:{'Content-Type':'charset=UTF-8'} }});
+            var data = temp.query();
+            data.$promise.then( function() {
+                //var books = data.content;
+                success( data );
+            });
+        };
+
+        /*All outcoming and incoming requests*/
+        service.getAllBorrowRequests = function(id ,success, failure) {
+            var temp = $resource('users/'+id+'/borrow-lent',
+            {},
+            {'query': {method: 'GET', isArray: true, headers:{'Content-Type':'charset=UTF-8'} }});
+            var data = temp.query();
+            data.$promise.then( function() {
+                //var books = data.content;
+                success( data );
+            });
+        };
+
+        /*
+        service.getMyBorrowRequests = function(id ,success, failure) {
             var temp = $resource('users/'+id+'/borrow',
             {},
             {'query': {method: 'GET', isArray: true, headers:{'Content-Type':'charset=UTF-8'} }});
@@ -234,6 +311,7 @@ angular.module('booksApp.books')
                 success( data );
             });
         };
+        */
 
         service.getFriendsBooks = function(id ,success, failure) {
             var temp = $resource('users/'+id+'/books?view=friends-available',
@@ -344,6 +422,58 @@ angular.module('booksApp.friends')
 	/* @ngInject */
 	angular.module('booksApp.home').controller('HomeCtrl', ['$scope', HomeCtrl]); 
 
+
+'use strict';
+
+	/* @ngInject */
+	function LoginCtrl($rootScope, $scope, $http, $location){
+		var model = this;
+
+		function init() {
+            // A definitive place to put everything that needs to run when the controller starts. Avoid
+            //  writing any code outside of this function that executes immediately.
+        	model.test = 'Login and Register here, oh.... I almost forgot.... <3';	
+            var authenticate = function(credentials, callback) {
+
+                var headers = credentials ? {authorization : 'Basic '
+                    + btoa(credentials.username + ':' + credentials.password)
+                } : {};
+
+                $http.get('user', {headers : headers}).success(function(data) {
+                  if (data.name) {
+                    $rootScope.authenticated = true;
+                  } else {
+                    $rootScope.authenticated = false;
+                  }
+                  callback && callback();
+                }).error(function() {
+                  $rootScope.authenticated = false;
+                  callback && callback();
+                });
+
+            };
+
+            authenticate();
+            $scope.credentials = {};
+            $scope.login = function() {
+                authenticate($scope.credentials, function() {
+                    if ($rootScope.authenticated) {
+                        $location.path('/');
+                        $scope.error = false;
+                    } else {
+                        $location.path('/login');
+                        $scope.error = true;
+                    }
+                });
+            };
+
+		}
+
+		init();
+	}
+
+	/* @ngInject */
+	angular.module('booksApp.login').controller('LoginCtrl', LoginCtrl); 
 
 'use strict';
 

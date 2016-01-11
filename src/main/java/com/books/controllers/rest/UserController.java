@@ -28,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -104,16 +106,30 @@ public class UserController {
         @RequestParam(value = "view", required=false, defaultValue = "") String view) {
 
         this.validateUser(userId);
-        if(view.isEmpty() || view.equals("friends")){
-            return new ResponseEntity<Object>(bookRepo.findByUserFriends(userId), new HttpHeaders(), HttpStatus.OK);
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(principal instanceof UserDetails) {
+            UserDetails details = (UserDetails)principal;
+            User loggedIn = userRepo.findByEmail(details.getUsername()).get();
+            if(loggedIn.getId() == userId) {
+                /*--- secured view :) ---*/
+                if (view.isEmpty() || view.equals("friends")) {
+                    return new ResponseEntity<Object>(bookRepo.findByUserFriends(userId), new HttpHeaders(), HttpStatus.OK);
+                } else if (view.equals("friends-available")) {
+                    return new ResponseEntity<Object>(bookRepo.findByUserFriendsWithAvailability(userId), new HttpHeaders(), HttpStatus.OK);
+                    //return new ResponseEntity<Object>(bookRepo.findByUserFriends(userId), new HttpHeaders(), HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<Object>(bookOfUserRepo.findByUserId(userId), new HttpHeaders(), HttpStatus.OK);
+                }
+                
+            } else {
+                //throw new ForbiddenException();
+                return new ResponseEntity<Object>("User not logged in", new HttpHeaders(), HttpStatus.FORBIDDEN);
+            }
+        } else {
+            //throw new ForbiddenException();
+            return new ResponseEntity<Object>("Restriction problem", new HttpHeaders(), HttpStatus.FORBIDDEN);
         }
-        else if(view.equals("friends-available")){
-            return new ResponseEntity<Object>(bookRepo.findByUserFriendsWithAvailability(userId), new HttpHeaders(), HttpStatus.OK);
-            //return new ResponseEntity<Object>(bookRepo.findByUserFriends(userId), new HttpHeaders(), HttpStatus.OK);
-        }
-        else{
-            return new ResponseEntity<Object>(bookOfUserRepo.findByUserId(userId), new HttpHeaders(), HttpStatus.OK);
-        }
+        
     }
     
     @RequestMapping(method = RequestMethod.GET, value = "/{userId}/books/{bookId}")
@@ -405,7 +421,8 @@ public class UserController {
         {
             return new ResponseEntity<Object>("A user can't borrow a book more than once!", new HttpHeaders(), HttpStatus.BAD_REQUEST);
         }
-        BorrowedBook temp2 = borrowedBookRepo.save(new BorrowedBook(userRepo.findById(userId).get(),tempBook/*, input*/));
+        input.update(userRepo.findById(userId).get(), tempBook);
+        BorrowedBook temp2 = borrowedBookRepo.save(input);
         //temp = borrowedBookRepo.findByUserIdAndFriendId(userId, bookId);
         return new ResponseEntity<Object>(temp2, new HttpHeaders(), HttpStatus.CREATED);
     }

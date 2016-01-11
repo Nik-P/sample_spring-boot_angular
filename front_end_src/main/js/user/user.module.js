@@ -14,6 +14,6 @@ angular.module('booksApp.user',
                 templateUrl: 'front_end_src/main/js/user/user.html'
             }
         },
-        data:{ pageTitle: 'Home' }
+        data:{ pageTitle: 'Profile' }
     });
 });

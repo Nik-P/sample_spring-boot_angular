@@ -47,6 +47,8 @@ public class User extends StartEntity {
     private String firstName;
     private String surName;
     private String profilePicture;
+    @JsonIgnore
+    private String password;
     @Size( min=8 )
     private String telephone;
     
@@ -164,6 +166,20 @@ public class User extends StartEntity {
      */
     public void setFriend(Set<UserFriend> friend) {
         this.friend = friend;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 }
