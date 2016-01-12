@@ -21,19 +21,23 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
    
+    @Autowired
     private AuthSuccess authSuccess;
     
+    @Autowired
     private AuthFailure authFailure;
-    
+   
+    @Autowired
     private UserDetailServiceImpl userDetailService;
     
-    @Autowired
-    public WebSecurityConfig(AuthSuccess authSuccess,
+    
+    /*public WebSecurityConfig(AuthSuccess authSuccess,
                             AuthFailure authFailure,
                             UserDetailServiceImpl userDetailService){
         this.authSuccess = authSuccess;
         this.authFailure = authFailure;
-    }
+        this.userDetailService = userDetailService;
+    }*/
     
     /*@Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {

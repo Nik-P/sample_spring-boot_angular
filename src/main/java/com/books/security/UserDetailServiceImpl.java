@@ -11,11 +11,13 @@ import com.books.repo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author nik
  */
+@Component
 public class UserDetailServiceImpl implements UserDetailsService{
     
     private UserRepo userRepo;

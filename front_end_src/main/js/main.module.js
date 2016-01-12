@@ -23,7 +23,7 @@ angular.module('booksApp',
       $urlRouterProvider.otherwise('/home');
 
       /*--- Deprecated Security ---*/
-      $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
+      //$httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
   });
 
 
