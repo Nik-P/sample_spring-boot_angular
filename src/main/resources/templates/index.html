@@ -20,7 +20,7 @@
 	
 </head>
 <body ng-app="booksApp" ng-controller="MainCtrl" >
-	<div class="column-10 column-offset-1">
+	<div class="col-md-10 col-md-offset-1 no-padding-horizontal">
 		<div id="left-menu" class="text-uppercase">
 			<ul id="left" class="main sf-menu">
 				<li ui-sref-active="active">
@@ -93,7 +93,7 @@
 			</ul>
 		</div>
 		<script type="text/javascript">
-			(function($){
+			/*(function($){
 				$(document).ready(function(){
 					console.log("Hello jquery");
 					var login = $("#right");
@@ -105,7 +105,7 @@
 					console.log(right + " right");
 					$("#right").css("margin-left",right);
 				});
-			})(jQuery);
+			})(jQuery);*/
 		</script>
 		<!--<div id="right-menu">
 			<ul id="right" class="sf-menu">
@@ -122,18 +122,22 @@
         <form th:action="@{/logout}" method="post">
             <input type="submit" value="Sign Out"/>
         </form>-->
-		<a href ui-sref="login">login</a>
-		<div ng-show="authenticated">
-			<p>The ID is {{greeting.id}}</p>
-			<p>The content is {{greeting.content}}</p>
-		</div>
-		<div  ng-show="!authenticated">
-			<p>Login to see your greeting</p>
-		</div>
-
+		
 
 		<div class="main-body">
-			<div ui-view="main"></div>
+			
+			<!-- Testing -->
+			<a href ui-sref="login">login</a>
+			<div ng-show="authenticated">
+				<p>The ID is {{greeting.id}}</p>
+				<p>The content is {{greeting.content}}</p>
+			</div>
+			<div  ng-show="!authenticated">
+				<p>Login to see your greeting</p>
+			</div>
+			<!-- Testing -->
+
+			<div class="row" ui-view="main"></div>
 	
 			<h3>Spring Boot and Thymeleaf</h3>
 			<p>Hello World!</p>

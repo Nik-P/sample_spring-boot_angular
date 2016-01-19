@@ -73,13 +73,45 @@ public class UserController {
     
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> createUser(@RequestBody @Valid User user) {
+        Optional authenticate = userRepo.findByEmail(user.getEmail());
+        if(authenticate.isPresent()){
+            return new ResponseEntity<Object>(authenticate.get(), new HttpHeaders(), HttpStatus.OK);
+        }
         User temp = userRepo.save(user);
         return new ResponseEntity<>(temp, new HttpHeaders(), HttpStatus.CREATED);
     }
     
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<?> getAllUsers() {
+    @RequestMapping(method = RequestMethod.POST, value = "/{userId}/login")
+    public ResponseEntity<?> loginUsers(@RequestBody @Valid User user) {
 
+        if(!user.getEmail().isEmpty() && !user.getPassword().isEmpty()){
+            Optional authenticate = userRepo.findByEmail(user.getEmail());//,user.getPassword());
+            //User temp = authenticate.get();
+            if(authenticate.isPresent()){
+                return new ResponseEntity<Object>(authenticate.get(), new HttpHeaders(), HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<Object>( new HttpHeaders(), HttpStatus.NOT_FOUND);
+            }
+        }
+        //this.validateUser(userId);
+        //bookRepo.save(new Book());
+        //return userRepo.findById(userId);
+        return new ResponseEntity<Object>(userRepo.findAll(), new HttpHeaders(), HttpStatus.OK);
+    }
+    
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<?> getAllUsers(@RequestParam(value="email", required = false, defaultValue = "") String email) {
+
+        if(!email.isEmpty()){
+            Optional authenticate = userRepo.findByEmail(email);
+            if(authenticate.isPresent()){
+                return new ResponseEntity<Object>(authenticate.get(), new HttpHeaders(), HttpStatus.OK);
+            }
+            else {
+                return new ResponseEntity<Object>( new HttpHeaders(), HttpStatus.NOT_FOUND);
+            }
+        }
         //this.validateUser(userId);
         //bookRepo.save(new Book());
         //return userRepo.findById(userId);

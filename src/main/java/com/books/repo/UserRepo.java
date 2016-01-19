@@ -17,6 +17,8 @@ public interface UserRepo extends PagingAndSortingRepository<User, Long> {
 
     Optional<User> findByEmail(@Param("email") String email);
     
+    Optional<User> findByEmailAndPassword(@Param("email") String email, @Param("password") String password);
+    
     Optional<User> findById(@Param("id") Long id);
 
 }

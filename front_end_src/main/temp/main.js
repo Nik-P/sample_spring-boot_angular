@@ -23,7 +23,7 @@ angular.module('booksApp',
       $urlRouterProvider.otherwise('/home');
 
       /*--- Deprecated Security ---*/
-      $httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
+      //$httpProvider.defaults.headers.common["X-Requested-With"] = 'XMLHttpRequest';
   });
 
 
@@ -426,46 +426,36 @@ angular.module('booksApp.friends')
 'use strict';
 
 	/* @ngInject */
-	function LoginCtrl($rootScope, $scope, $http, $location){
+	function LoginCtrl($rootScope, $scope, $state, UserService, sessionService){
 		var model = this;
 
 		function init() {
             // A definitive place to put everything that needs to run when the controller starts. Avoid
             //  writing any code outside of this function that executes immediately.
         	model.test = 'Login and Register here, oh.... I almost forgot.... <3';	
-            var authenticate = function(credentials, callback) {
-
-                var headers = credentials ? {authorization : 'Basic '
-                    + btoa(credentials.username + ':' + credentials.password)
-                } : {};
-
-                $http.get('user', {headers : headers}).success(function(data) {
-                  if (data.name) {
-                    $rootScope.authenticated = true;
-                  } else {
-                    $rootScope.authenticated = false;
-                  }
-                  callback && callback();
-                }).error(function() {
-                  $rootScope.authenticated = false;
-                  callback && callback();
-                });
-
-            };
-
-            authenticate();
-            $scope.credentials = {};
+            
             $scope.login = function() {
-                authenticate($scope.credentials, function() {
-                    if ($rootScope.authenticated) {
-                        $location.path('/');
-                        $scope.error = false;
-                    } else {
-                        $location.path('/login');
-                        $scope.error = true;
-                    }
-                });
-            };
+		        UserService.userExists($scope.account, function(account) {
+		            sessionService.login($scope.account).then(function() {
+		                $state.go("home");
+		            });
+		        },
+		        function() {
+		            alert("Error logging in user");
+		        });
+		    };
+
+		    $scope.register = function() {
+		        UserService.register($scope.account,
+		        function(returnedData) {
+		            sessionService.login($scope.account).then(function() {
+		                $state.go("home");
+		            });
+		        },
+		        function() {
+		            alert("Error registering user");
+		        });
+		    };
 
 		}
 
@@ -475,6 +465,63 @@ angular.module('booksApp.friends')
 	/* @ngInject */
 	angular.module('booksApp.login').controller('LoginCtrl', LoginCtrl); 
 
+'use strict';
+
+/* @ngInject */
+angular.module('booksApp.login')
+
+
+.factory('sessionService', function($http) {
+    var session = {};
+    session.login = function(data) {
+        return $http.post('/basic-web-app/login', 'email=' + data.email +
+        '&password=' + data.password, {
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        } ).then(function(data) {
+            alert('login successful');
+            localStorage.setItem('session', {});
+        }, function(data) {
+            alert('error logging in');
+        });
+    };
+    session.logout = function() {
+        localStorage.removeItem('session');
+    };
+    session.isLoggedIn = function() {
+        return localStorage.getItem('session') !== null;
+    };
+    return session;
+});
+/*.factory('accountService', function($resource) {
+    var service = {};
+    service.register = function(account, success, failure) {
+        var Account = $resource('/users');
+        Account.save({}, account, success, failure);
+    };
+    service.getAccountById = function(accountId) {
+        var Account = $resource('/users/:paramAccountId');
+        return Account.get({paramAccountId:accountId}).$promise;
+    };
+    service.userExists = function(account, success, failure) {
+        var Account = $resource('/users');
+        var data = Account.get({email:account.name, password:account.password}, function() {
+            var accounts = data.accounts;
+            if(accounts.length !== 0) {
+                success(account);
+            } else {
+                failure();
+            }
+        },
+        failure);
+    };
+    service.getAllAccounts = function() {
+          var Account = $resource('/users');
+          return Account.get().$promise.then(function(data) {
+            return data.accounts;
+          });
+    };
+    return service;
+})*/
 'use strict';
 
 	/* @ngInject */
@@ -528,6 +575,36 @@ angular.module('booksApp.user')
                 //var books = data.content;
                 success( data );
             });
+        };
+
+        service.register = function(account, success, failure) {
+            var Account = $resource('/users');
+            Account.save({}, account, success, failure);
+        };
+
+        service.userExists = function(account, success, failure) {
+            var Account = $resource('/users');
+            var data = Account.get({email:account.email, password:account.password}).
+            $promise.then(  function() {
+                var accounts = data;
+                if(accounts.length !== 0) {
+                    success(account);
+                } else {
+                    failure();
+                }
+            });
+            /*var Account = $resource('/users?email='+account.username+'&password='+account.password,
+            {},
+            {'query': {method: 'GET', isArray: true, headers:{'Content-Type':'charset=UTF-8'} }});
+            var data = Account.query();
+            data.$promise.then( function() {
+                var accounts = data;
+                if(accounts.length !== 0) {
+                    success(account);
+                } else {
+                    failure();
+                }
+            }); */
         };
 
         service.getAUser = function(userId ,success, failure) {

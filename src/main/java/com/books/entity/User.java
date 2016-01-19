@@ -47,7 +47,7 @@ public class User extends StartEntity {
     private String firstName;
     private String surName;
     private String profilePicture;
-    @JsonIgnore
+    //@JsonIgnore
     private String password;
     @Size( min=8 )
     private String telephone;
