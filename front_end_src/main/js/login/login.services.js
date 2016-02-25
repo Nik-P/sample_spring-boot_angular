@@ -7,18 +7,32 @@ angular.module('booksApp.login')
 .factory('sessionService', function($http) {
     var session = {};
     session.login = function(data) {
-        return $http.post('/basic-web-app/login', 'email=' + data.email +
-        '&password=' + data.password, {
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        //return $http.post('/basic-web-app/login', 'email=' + data.email +
+        return $http.post('/users/login', data, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json' 
+                //'Content-Type': 'application/x-www-form-urlencoded'
+            }
         } ).then(function(data) {
-            alert('login successful');
-            localStorage.setItem('session', {});
+            console.log('login successful');
+            console.log(data);
+            /*var userData = {};
+            userData.email = data.data.email;
+            userData.id = data.data.id;
+            userData.firstName = data.data.firstName;
+            userData.surName = data.data.surName;
+            console.log(userData);*/
+            localStorage.setItem('session', data.data.id);
         }, function(data) {
             alert('error logging in');
         });
     };
     session.logout = function() {
         localStorage.removeItem('session');
+    };
+    session.getUserInfo = function() {
+            return localStorage.getItem('session');
     };
     session.isLoggedIn = function() {
         return localStorage.getItem('session') !== null;

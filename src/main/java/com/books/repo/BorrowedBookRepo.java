@@ -52,6 +52,9 @@ public interface BorrowedBookRepo extends PagingAndSortingRepository<BorrowedBoo
     /* Used to find/delete/accept pending book requests */
     Optional<BorrowedBook> findByBorrowerIdAndBookIdAndReturnedAndDateBorrowedNull(@Param("id") Long id, @Param("bookId") Long bookId, @Param("returned") boolean returned);
     
+    /* Used for retrieving all borrowed books still in the user's custody */
+    List<BorrowedBook> findByBorrowerIdAndReturnedAndDateBorrowedNotNull(@Param("id") Long id, @Param("returned") boolean returned);
+    
     /* Used when returning a borrowed book */
     Optional<BorrowedBook> findByBorrowerIdAndBookIdAndReturnedAndDateBorrowedNotNull(@Param("id") Long id, @Param("bookId") Long bookId, @Param("returned") boolean returned);
 }

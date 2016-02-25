@@ -4,15 +4,15 @@
 		<thead>
 			<tr>
 				<th>Id</th>
-				<th>My email</th>
+				<th>Type</th>
 				<th>Creation date</th>
 			</tr>
 		</thead>
 		<tbody>
-			<tr >
-				<td>{{model.user.id}}</td>
-				<td>{{model.user.email}}</td>
-				<td>{{model.user.createdAt}}</td>
+			<tr ng-repeat="notification in model.notifications">
+				<td>{{notification.id}}</td>
+				<td>{{notification.user.email || "Nope"}}</td>
+				<td>{{notification.user.createdAt}}</td>
 			</tr>
 		</tbody>
 	</table>

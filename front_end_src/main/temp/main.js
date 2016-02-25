@@ -17,7 +17,8 @@ angular.module('booksApp',
 	'booksApp.books',
 	'booksApp.user',
 	'booksApp.login',
-	'booksApp.friends']);
+	'booksApp.friends',
+	'booksApp.notifications']);
 
   angular.module('booksApp').config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
       $urlRouterProvider.otherwise('/home');
@@ -34,25 +35,24 @@ angular.module('booksApp',
 	'booksApp.home']);*/
 
 	/* @ngInject */
-	function MainCtrl($scope){
+	function MainCtrl($scope, sessionService){
 		$scope.test = 'Hello';	
 		$scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
-        if ( angular.isDefined( toState.data.pageTitle ) ) {
-            $scope.pageTitle = toState.data.pageTitle + ' | Book' ;
-        }
-    });
+	        if ( angular.isDefined( toState.data.pageTitle ) ) {
+	            $scope.pageTitle = toState.data.pageTitle + ' | Book' ;
+	        }
+	    });
 
-    $scope.logout = function() {
-		  $http.post('logout', {}).success(function() {
-		    $rootScope.authenticated = false;
-		    $location.path("/");
-		  }).error(function(data) {
-		    $rootScope.authenticated = false;
-		  });
-		}
+	    $scope.isLoggedIn = sessionService.isLoggedIn;
+
+		$scope.logout = function(){ 
+			if($scope.isLoggedIn()){
+				sessionService.logout(); 
+			}
+		};
 	}
 	/* @ngInject */
-	angular.module('booksApp').controller('MainCtrl', ['$scope', MainCtrl]);
+	angular.module('booksApp').controller('MainCtrl', MainCtrl);
 
 
 'use strict';
@@ -135,6 +135,25 @@ angular.module('booksApp.login',
 'use strict';
 
 /* @ngInject */
+angular.module('booksApp.notifications', 
+[]
+)
+
+.config(function ($stateProvider) {
+    $stateProvider.state('notifications', {
+        url: '/notifications',
+        views: {
+            'main': {
+                controller: 'NotificationsCtrl as model',
+                templateUrl: 'front_end_src/main/js/notifications/notifications.html'
+            }
+        },
+        data:{ pageTitle: 'User notifications' }
+    });
+});
+'use strict';
+
+/* @ngInject */
 angular.module('booksApp.user', 
 []
 )
@@ -154,7 +173,7 @@ angular.module('booksApp.user',
 'use strict';
 
 	/* @ngInject */
-	function BooksCtrl(BookService, $stateParams){
+	function BooksCtrl(BookService, $stateParams, sessionService, $state){
 		var model = this;
 
 		function init() {
@@ -164,22 +183,90 @@ angular.module('booksApp.user',
         	
             model.view = $stateParams.view;
 
-            model.initBooks = function(){
-                if(model.view === 'friends'){
-                    model.getFriendsBooks(1);
-                }
-                else if(model.view === 'friends-available'){
-                    model.getFriendsBooks(1);
-                }
-                else if(model.view === 'my_books'){
-                    model.getUserBooks(1);
-                }
-                else if(model.view === 'my_book_requests'){
-                    model.getAllBorrowRequests(1);
-                    /*model.getMyBorrowRequests(1);*/
+            model.isLoggedIn = sessionService.isLoggedIn;
+
+            model.initFriends = function() {
+                if(model.isLoggedIn()){
+                  model.userInfo = sessionService.getUserInfo();
+                  model.getAllFriends(model.userInfo);
+                  
                 }
                 else{
-                    model.getAllBooks();
+                    $state.go('login');
+                }
+            };
+
+            model.initBooks = function(){
+                if(model.isLoggedIn()){
+                    if(model.view === 'friends'){
+                        model.getFriendsBooks(1);
+                    }
+                    else if(model.view === 'friends-available'){
+                        model.getFriendsBooks(1);
+                    }
+                    else if(model.view === 'my_books'){
+                        model.getUserBooks(1);
+                    }
+                    else if(model.view === 'my_book_requests'){
+                        /* Select requests clause Init */
+                        model.singleSelect = 'all';
+                        /* Search model Init */
+                        model.search = {};
+                        model.searchMode = true;
+                        /* Owner of book Init ==> Coresponding SQL TABLE User */
+                        model.search.owner = {};
+                        /* Borrower of book Init ==> Coresponding SQL TABLE User */
+                        model.search.borrower= {};
+                        /* UserBook Init ==> Coresponding SQL TABLE UserBook */
+                        model.search.book = {};
+                        /* Book Init ==> Coresponding SQL TABLE Book */
+                        model.search.book.book = {};
+                        model.filterRequest = function(){
+                            if(model.singleSelect == 'all'){
+                                model.search.owner = {};
+                                model.search.borrower = {};
+                                model.search.book = {};
+                                model.search.book.book = {};
+                                model.searchMode = true;
+                            }
+                            else if(model.singleSelect == 'for-me'){
+                                model.search.owner.email = "book1@hot.gr";
+                                model.search.borrower = {};
+                                model.search.book = {};
+                                model.search.book.book = {};
+                                model.searchMode = true;
+                            }
+                            else if(model.singleSelect == 'by-me'){
+                                model.search.owner = {};
+                                model.search.borrower = "book1@hot.gr";
+                                model.search.book = {};
+                                model.search.book.book = {};
+                                model.searchMode = true;
+                            }
+                            else/* if(model.singleSelect == 'by-book-title')*/{
+                                model.search.owner = {};
+                                model.search.borrower = {};
+                                model.search.book = {};
+                                model.search.book.book = {};
+                                model.searchMode = false;
+                                //model.search.book.book.title = '';
+                            }
+                        };
+                        model.getAllBorrowRequests(1);
+                        /*model.getMyBorrowRequests(1);*/
+                    }
+                    else{
+                        model.getAllBooks();
+                    }
+                }
+                else{
+                    if(model.view === 'friends' || model.view === 'friends-available' 
+                    || model.view === 'my_books' || model.view === 'my_book_requests'){
+                        $state.go('login');
+                    }
+                    else{
+                        model.getAllBooks();
+                    }
                 }
             }
 
@@ -316,7 +403,7 @@ angular.module('booksApp.books')
         service.getFriendsBooks = function(id ,success, failure) {
             var temp = $resource('users/'+id+'/books?view=friends-available',
             {},
-            {'query': {method: 'GET', isArray: true, headers:{'Content-Type':'charset=UTF-8'} }});
+            {'query': {method: 'GET', isArray: false, headers:{'Content-Type':'charset=UTF-8'} }});
             var data = temp.query();
             data.$promise.then( function() {
                 //var books = data.content;
@@ -327,7 +414,7 @@ angular.module('booksApp.books')
         service.getUserBooks = function(id ,success, failure) {
             var temp = $resource('users/'+id+'/books?view=mine',
             {},
-            {'query': {method: 'GET', isArray: true, headers:{'Content-Type':'charset=UTF-8'} }});
+            {'query': {method: 'GET', isArray: false, headers:{'Content-Type':'charset=UTF-8'} }});
             var data = temp.query();
             data.$promise.then( function() {
                 //var books = data.content;
@@ -340,7 +427,7 @@ angular.module('booksApp.books')
 'use strict';
 
 	/* @ngInject */
-	function FriendsCtrl(FriendService){
+	function FriendsCtrl(FriendService, sessionService, $state){
 		var model = this;
 
 		function init() {
@@ -348,14 +435,23 @@ angular.module('booksApp.books')
             //  writing any code outside of this function that executes immediately.
         	model.test = 'My friends <3';
 
+            model.isLoggedIn = sessionService.isLoggedIn;
+
         	model.initFriends = function() {
-        		model.getAllFriends(1);
-        	};
+                if(model.isLoggedIn()){
+                  model.userInfo = sessionService.getUserInfo();
+                  model.getAllFriends(model.userInfo);
+                  
+                }
+                else{
+                    $state.go('login');
+                }
+            };
 
         	model.getAllFriends = function(id){
                 FriendService.getAllFriends(id,
                 function(friends){
-                    console.log('Retrieved Books');
+                    console.log('Retrieved Friends info');
                     model.friends = friends;
                 },
                 function(){
@@ -437,11 +533,11 @@ angular.module('booksApp.friends')
             $scope.login = function() {
 		        UserService.userExists($scope.account, function(account) {
 		            sessionService.login($scope.account).then(function() {
-		                $state.go("home");
+		                $state.go('home');
 		            });
 		        },
 		        function() {
-		            alert("Error logging in user");
+		            alert('Error logging in user');
 		        });
 		    };
 
@@ -449,11 +545,11 @@ angular.module('booksApp.friends')
 		        UserService.register($scope.account,
 		        function(returnedData) {
 		            sessionService.login($scope.account).then(function() {
-		                $state.go("home");
+		                $state.go('home');
 		            });
 		        },
 		        function() {
-		            alert("Error registering user");
+		            alert('Error registering user');
 		        });
 		    };
 
@@ -474,18 +570,32 @@ angular.module('booksApp.login')
 .factory('sessionService', function($http) {
     var session = {};
     session.login = function(data) {
-        return $http.post('/basic-web-app/login', 'email=' + data.email +
-        '&password=' + data.password, {
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        //return $http.post('/basic-web-app/login', 'email=' + data.email +
+        return $http.post('/users/login', data, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json' 
+                //'Content-Type': 'application/x-www-form-urlencoded'
+            }
         } ).then(function(data) {
-            alert('login successful');
-            localStorage.setItem('session', {});
+            console.log('login successful');
+            console.log(data);
+            /*var userData = {};
+            userData.email = data.data.email;
+            userData.id = data.data.id;
+            userData.firstName = data.data.firstName;
+            userData.surName = data.data.surName;
+            console.log(userData);*/
+            localStorage.setItem('session', data.data.id);
         }, function(data) {
             alert('error logging in');
         });
     };
     session.logout = function() {
         localStorage.removeItem('session');
+    };
+    session.getUserInfo = function() {
+            return localStorage.getItem('session');
     };
     session.isLoggedIn = function() {
         return localStorage.getItem('session') !== null;
@@ -525,7 +635,73 @@ angular.module('booksApp.login')
 'use strict';
 
 	/* @ngInject */
-	function UserCtrl(UserService){
+	function NotificationsCtrl(NotificationsService, sessionService, $state){
+		var model = this;
+
+		function init() {
+            // A definitive place to put everything that needs to run when the controller starts. Avoid
+            //  writing any code outside of this function that executes immediately.
+        	model.test = 'Check your notifications <3';	
+
+            model.isLoggedIn = sessionService.isLoggedIn;
+
+        	model.initUser = function() {
+                if(model.isLoggedIn()){
+        		  model.userInfo = sessionService.getUserInfo();
+                  model.getMyInfo(model.userInfo);
+                  
+                }
+                else{
+                    $state.go('login');
+                }
+        	};
+
+            model.getMyInfo = function(id){
+                NotificationsService.getAllNotifications(id,
+                function(notifications){
+                    console.log('Retrieved User info');
+                    model.notifications = notifications;
+                },
+                function(){
+                    alert('Error retrieving friends books');
+                });
+            };	
+
+		}
+
+		init();
+	}
+
+	/* @ngInject */
+	angular.module('booksApp.notifications').controller('NotificationsCtrl', NotificationsCtrl); 
+
+
+'use strict';
+
+/* @ngInject */
+angular.module('booksApp.notifications')
+    
+    /* @ngInject */
+    .factory('NotificationsService', function($resource) {
+        var service = {};
+        
+        service.getAllNotifications = function(id ,success, failure) {
+            var temp = $resource('users/'+id+'/active-borrowed-books',
+            {},
+            {'query': {method: 'GET', isArray: true, headers:{'Content-Type':'charset=UTF-8'} }});
+            var data = temp.query();
+            data.$promise.then( function() {
+                //var books = data.content;
+                success( data );
+            });
+        };
+
+        return service;
+    });
+'use strict';
+
+	/* @ngInject */
+	function UserCtrl(UserService, sessionService, $state){
 		var model = this;
 
 		function init() {
@@ -533,14 +709,23 @@ angular.module('booksApp.login')
             //  writing any code outside of this function that executes immediately.
         	model.test = 'Ohh,this is a page for users <3';	
 
+            model.isLoggedIn = sessionService.isLoggedIn;
+
         	model.initUser = function() {
-        		model.getMyInfo(1);
+                if(model.isLoggedIn()){
+        		  model.userInfo = sessionService.getUserInfo();
+                  model.getMyInfo(model.userInfo);
+                  
+                }
+                else{
+                    $state.go('login');
+                }
         	};
 
-        	model.getMyInfo = function(id){
+            model.getMyInfo = function(id){
                 UserService.getAUser(id,
                 function(user){
-                    console.log('Retrieved Books');
+                    console.log('Retrieved User info');
                     model.user = user;
                 },
                 function(){
@@ -610,7 +795,7 @@ angular.module('booksApp.user')
         service.getAUser = function(userId ,success, failure) {
             var temp = $resource('users/'+userId,
             {},
-            {'query': {method: 'GET', isArray: true, headers:{'Content-Type':'charset=UTF-8'} }});
+            {'query': {method: 'GET', isArray: false, headers:{'Content-Type':'charset=UTF-8'} }});
             var data = temp.query();
             data.$promise.then( function() {
                 //var books = data.content;

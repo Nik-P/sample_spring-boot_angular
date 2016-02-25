@@ -24,6 +24,8 @@ public interface BookOfUserRepo extends PagingAndSortingRepository<BookOfUser, L
     
     List<BookOfUser> findByUserId(@Param("id") Long id);
     
+    Page<BookOfUser> findByUserId(Pageable pageable, @Param("id") Long id);
+    
     Optional<BookOfUser> findByUserIdAndBookId(@Param("id") Long id, @Param("bId") Long bId);
     
     List<BookOfUser> findByBookTitle(@Param("title") String title);

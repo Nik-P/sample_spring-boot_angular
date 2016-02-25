@@ -17,7 +17,8 @@ angular.module('booksApp',
 	'booksApp.books',
 	'booksApp.user',
 	'booksApp.login',
-	'booksApp.friends']);
+	'booksApp.friends',
+	'booksApp.notifications']);
 
   angular.module('booksApp').config(function ($stateProvider, $urlRouterProvider, $httpProvider) {
       $urlRouterProvider.otherwise('/home');
@@ -34,23 +35,22 @@ angular.module('booksApp',
 	'booksApp.home']);*/
 
 	/* @ngInject */
-	function MainCtrl($scope){
+	function MainCtrl($scope, sessionService){
 		$scope.test = 'Hello';	
 		$scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
-        if ( angular.isDefined( toState.data.pageTitle ) ) {
-            $scope.pageTitle = toState.data.pageTitle + ' | Book' ;
-        }
-    });
+	        if ( angular.isDefined( toState.data.pageTitle ) ) {
+	            $scope.pageTitle = toState.data.pageTitle + ' | Book' ;
+	        }
+	    });
 
-    $scope.logout = function() {
-		  $http.post('logout', {}).success(function() {
-		    $rootScope.authenticated = false;
-		    $location.path("/");
-		  }).error(function(data) {
-		    $rootScope.authenticated = false;
-		  });
-		}
+	    $scope.isLoggedIn = sessionService.isLoggedIn;
+
+		$scope.logout = function(){ 
+			if($scope.isLoggedIn()){
+				sessionService.logout(); 
+			}
+		};
 	}
 	/* @ngInject */
-	angular.module('booksApp').controller('MainCtrl', ['$scope', MainCtrl]);
+	angular.module('booksApp').controller('MainCtrl', MainCtrl);
 

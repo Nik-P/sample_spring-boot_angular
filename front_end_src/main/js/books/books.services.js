@@ -57,7 +57,7 @@ angular.module('booksApp.books')
         service.getFriendsBooks = function(id ,success, failure) {
             var temp = $resource('users/'+id+'/books?view=friends-available',
             {},
-            {'query': {method: 'GET', isArray: true, headers:{'Content-Type':'charset=UTF-8'} }});
+            {'query': {method: 'GET', isArray: false, headers:{'Content-Type':'charset=UTF-8'} }});
             var data = temp.query();
             data.$promise.then( function() {
                 //var books = data.content;
@@ -68,7 +68,7 @@ angular.module('booksApp.books')
         service.getUserBooks = function(id ,success, failure) {
             var temp = $resource('users/'+id+'/books?view=mine',
             {},
-            {'query': {method: 'GET', isArray: true, headers:{'Content-Type':'charset=UTF-8'} }});
+            {'query': {method: 'GET', isArray: false, headers:{'Content-Type':'charset=UTF-8'} }});
             var data = temp.query();
             data.$promise.then( function() {
                 //var books = data.content;

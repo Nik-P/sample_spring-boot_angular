@@ -12,11 +12,11 @@
             $scope.login = function() {
 		        UserService.userExists($scope.account, function(account) {
 		            sessionService.login($scope.account).then(function() {
-		                $state.go("home");
+		                $state.go('home');
 		            });
 		        },
 		        function() {
-		            alert("Error logging in user");
+		            alert('Error logging in user');
 		        });
 		    };
 
@@ -24,11 +24,11 @@
 		        UserService.register($scope.account,
 		        function(returnedData) {
 		            sessionService.login($scope.account).then(function() {
-		                $state.go("home");
+		                $state.go('home');
 		            });
 		        },
 		        function() {
-		            alert("Error registering user");
+		            alert('Error registering user');
 		        });
 		    };
 

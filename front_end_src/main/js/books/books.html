@@ -3,14 +3,14 @@
 	<table class="table table-hover table-condensed">
 
 	<!-- View all books -->
-		<thead ng-show="model.view==='all'">
+		<thead ng-if="model.view==='all'">
 			<tr>
 				<th>Id</th>
 				<th>Title</th>
 				<th>Isbn</th>
 			</tr>
 		</thead>
-		<tbody ng-show="model.view==='all'">
+		<tbody ng-if="model.view==='all'">
 			<tr ng-repeat="book in model.books">
 				<td>{{book.id}}</td>
 				<td>{{book.title}}</td>
@@ -19,31 +19,44 @@
 		</tbody>
 		
 	<!-- View mine or friends books -->
-		<thead ng-show="model.view==='friends' || model.view==='my_books'">
+		<thead ng-if="model.view==='friends' || model.view==='my_books'">
 			<tr>
 				<th>Id</th>
 				<th>Email</th>
+				<th>Title</th>
 				<th>Isbn</th>
 			</tr>
 		</thead>
-		<tbody ng-show="model.view==='friends' || model.view==='my_books'">
-			<tr ng-repeat="book in model.books">
+		<tbody ng-if="model.view==='friends' || model.view==='my_books'">
+			<tr ng-repeat="book in model.books.content">
 				<td>{{book.id}}</td>
 				<td>{{book.user.email}}</td>
+				<td>{{book.book.title}}</td>
 				<td>{{book.book.isbn}}</td>
 			</tr>
 		</tbody>
 		
 	<!-- View my outcoming and incoming book requests -->
-		<thead ng-show="model.view==='my_book_requests'">
+	<select name="singleSelect" id="singleSelect" ng-change="model.filterRequest()" ng-model="model.singleSelect" ng-if="model.view==='my_book_requests'">
+      <option value="all">View all requests</option> <!-- not selected / blank option -->
+      <option value="for-me">View incoming</option> <!-- interpolation -->
+      <option value="by-me">View outcoming</option>
+      <option value="by-book-title">Search by book title</option>
+    </select>
+    &nbsp;
+    <input ng-if="model.view==='my_book_requests' && model.singleSelect==='by-book-title'" ng-model="model.search.book.book.title" type="text">
+    <br/>
+		<thead ng-if="model.view==='my_book_requests'">
 			<tr>
 				<th>Id</th>
-				<th>Email</th>
+				<th>Owner Email</th>
+				<th>Borrower Email</th>
+				<th>Title</th>
 				<th>Isbn</th>
 			</tr>
 		</thead>
-		<tbody ng-show="model.view==='my_book_requests'">
-			<tr ng-repeat="book in model.books">
+		<tbody ng-if="model.view==='my_book_requests'">
+			<tr ng-repeat="book in model.books | filter:model.search:model.searchMode">
 				<td>{{book.id}}</td>
 				<td>{{book.owner.email}}</td>
 				<td>{{book.borrower.email}}</td>

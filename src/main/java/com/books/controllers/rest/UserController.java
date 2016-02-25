@@ -18,12 +18,14 @@ import com.books.repo.BookRepo;
 import com.books.repo.BorrowedBookRepo;
 import com.books.repo.UserFriendRepo;
 import com.books.repo.UserRepo;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 //import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -81,7 +83,7 @@ public class UserController {
         return new ResponseEntity<>(temp, new HttpHeaders(), HttpStatus.CREATED);
     }
     
-    @RequestMapping(method = RequestMethod.POST, value = "/{userId}/login")
+    @RequestMapping(method = RequestMethod.POST, value = "/login")
     public ResponseEntity<?> loginUsers(@RequestBody @Valid User user) {
 
         if(!user.getEmail().isEmpty() && !user.getPassword().isEmpty()){
@@ -138,29 +140,29 @@ public class UserController {
         @RequestParam(value = "view", required=false, defaultValue = "") String view) {
 
         this.validateUser(userId);
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        /*Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if(principal instanceof UserDetails) {
             UserDetails details = (UserDetails)principal;
             User loggedIn = userRepo.findByEmail(details.getUsername()).get();
             if(loggedIn.getId() == userId) {
                 /*--- secured view :) ---*/
                 if (view.isEmpty() || view.equals("friends")) {
-                    return new ResponseEntity<Object>(bookRepo.findByUserFriends(userId), new HttpHeaders(), HttpStatus.OK);
+                    return new ResponseEntity<Object>(bookRepo.findByUserFriends(new PageRequest(page, limit),userId), new HttpHeaders(), HttpStatus.OK);
                 } else if (view.equals("friends-available")) {
-                    return new ResponseEntity<Object>(bookRepo.findByUserFriendsWithAvailability(userId), new HttpHeaders(), HttpStatus.OK);
+                    return new ResponseEntity<Object>(bookRepo.findByUserFriendsWithAvailability(new PageRequest(page, limit),userId), new HttpHeaders(), HttpStatus.OK);
                     //return new ResponseEntity<Object>(bookRepo.findByUserFriends(userId), new HttpHeaders(), HttpStatus.OK);
                 } else {
                     return new ResponseEntity<Object>(bookOfUserRepo.findByUserId(userId), new HttpHeaders(), HttpStatus.OK);
                 }
                 
-            } else {
+       /*     } else {
                 //throw new ForbiddenException();
                 return new ResponseEntity<Object>("User not logged in", new HttpHeaders(), HttpStatus.FORBIDDEN);
             }
         } else {
             //throw new ForbiddenException();
             return new ResponseEntity<Object>("Restriction problem", new HttpHeaders(), HttpStatus.FORBIDDEN);
-        }
+        }*/
         
     }
     
@@ -457,6 +459,62 @@ public class UserController {
         BorrowedBook temp2 = borrowedBookRepo.save(input);
         //temp = borrowedBookRepo.findByUserIdAndFriendId(userId, bookId);
         return new ResponseEntity<Object>(temp2, new HttpHeaders(), HttpStatus.CREATED);
+    }
+    
+    /*----------------------*/
+    /*-----------    Notifications Segment    -----------*/
+    /*----------------------*/
+    @RequestMapping(method = RequestMethod.GET, value = "/{userId}/notifications")
+    public ResponseEntity<?> getAllUserNotifications(@PathVariable Long userId , 
+        @RequestParam(value = "limit", required=false, defaultValue = "10") int limit, 
+        @RequestParam(value = "page", required=false, defaultValue = "0") int page,
+        @RequestParam(value = "view", required=false, defaultValue = "") String view) {
+
+        this.validateUser(userId);
+        
+        /* Get incoming, unanswered friend requests */
+        List<User> friendRequests;
+        friendRequests = userFriendRepo.findByFriendIdAndAccepted(userId, false);
+        
+        List<BorrowedBook> bookRequests;
+        bookRequests = borrowedBookRepo.findByOwnerIdAndReturnedAndDateBorrowedNull(userId, false);
+        
+        List<Object> allRequests;
+        allRequests = new ArrayList();
+        
+        allRequests.addAll(friendRequests);
+        allRequests.addAll(bookRequests);
+        
+        return new ResponseEntity<Object>(allRequests, new HttpHeaders(), HttpStatus.OK);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/{userId}/friend-requests")
+    public ResponseEntity<?> getFriendRequests(@PathVariable Long userId , 
+        @RequestParam(value = "limit", required=false, defaultValue = "10") int limit, 
+        @RequestParam(value = "page", required=false, defaultValue = "0") int page,
+        @RequestParam(value = "view", required=false, defaultValue = "") String view) {
+
+        this.validateUser(userId);
+        
+        /* Get incoming, unanswered friend requests */
+        List<User> friendRequests;
+        friendRequests = userFriendRepo.findByFriendIdAndAccepted(userId, false);
+        
+        return new ResponseEntity<Object>(friendRequests, new HttpHeaders(), HttpStatus.OK);
+    }
+    
+    @RequestMapping(method = RequestMethod.GET, value = "/{userId}/active-borrowed-books")
+    public ResponseEntity<?> getListOfActiveBorrowedBooks(@PathVariable Long userId , 
+        @RequestParam(value = "limit", required=false, defaultValue = "10") int limit, 
+        @RequestParam(value = "page", required=false, defaultValue = "0") int page,
+        @RequestParam(value = "view", required=false, defaultValue = "") String view) {
+
+        this.validateUser(userId);
+        
+        List<BorrowedBook> booksInCustody;
+        booksInCustody = borrowedBookRepo.findByBorrowerIdAndReturnedAndDateBorrowedNotNull(userId, false);
+        
+        return new ResponseEntity<Object>(booksInCustody, new HttpHeaders(), HttpStatus.OK);
     }
     
     /*----------------------*/

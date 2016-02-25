@@ -30,4 +30,6 @@ public interface UserFriendRepo extends PagingAndSortingRepository<UserFriend, L
     
     List<User> findByFriendId(@Param("id") Long id);
 
+    List<User> findByFriendIdAndAccepted(@Param("id") Long id, @Param("accepted") boolean accepted);
+
 }

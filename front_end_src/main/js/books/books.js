@@ -1,7 +1,7 @@
 'use strict';
 
 	/* @ngInject */
-	function BooksCtrl(BookService, $stateParams){
+	function BooksCtrl(BookService, $stateParams, sessionService, $state){
 		var model = this;
 
 		function init() {
@@ -11,22 +11,90 @@
         	
             model.view = $stateParams.view;
 
-            model.initBooks = function(){
-                if(model.view === 'friends'){
-                    model.getFriendsBooks(1);
-                }
-                else if(model.view === 'friends-available'){
-                    model.getFriendsBooks(1);
-                }
-                else if(model.view === 'my_books'){
-                    model.getUserBooks(1);
-                }
-                else if(model.view === 'my_book_requests'){
-                    model.getAllBorrowRequests(1);
-                    /*model.getMyBorrowRequests(1);*/
+            model.isLoggedIn = sessionService.isLoggedIn;
+
+            model.initFriends = function() {
+                if(model.isLoggedIn()){
+                  model.userInfo = sessionService.getUserInfo();
+                  model.getAllFriends(model.userInfo);
+                  
                 }
                 else{
-                    model.getAllBooks();
+                    $state.go('login');
+                }
+            };
+
+            model.initBooks = function(){
+                if(model.isLoggedIn()){
+                    if(model.view === 'friends'){
+                        model.getFriendsBooks(1);
+                    }
+                    else if(model.view === 'friends-available'){
+                        model.getFriendsBooks(1);
+                    }
+                    else if(model.view === 'my_books'){
+                        model.getUserBooks(1);
+                    }
+                    else if(model.view === 'my_book_requests'){
+                        /* Select requests clause Init */
+                        model.singleSelect = 'all';
+                        /* Search model Init */
+                        model.search = {};
+                        model.searchMode = true;
+                        /* Owner of book Init ==> Coresponding SQL TABLE User */
+                        model.search.owner = {};
+                        /* Borrower of book Init ==> Coresponding SQL TABLE User */
+                        model.search.borrower= {};
+                        /* UserBook Init ==> Coresponding SQL TABLE UserBook */
+                        model.search.book = {};
+                        /* Book Init ==> Coresponding SQL TABLE Book */
+                        model.search.book.book = {};
+                        model.filterRequest = function(){
+                            if(model.singleSelect == 'all'){
+                                model.search.owner = {};
+                                model.search.borrower = {};
+                                model.search.book = {};
+                                model.search.book.book = {};
+                                model.searchMode = true;
+                            }
+                            else if(model.singleSelect == 'for-me'){
+                                model.search.owner.email = "book1@hot.gr";
+                                model.search.borrower = {};
+                                model.search.book = {};
+                                model.search.book.book = {};
+                                model.searchMode = true;
+                            }
+                            else if(model.singleSelect == 'by-me'){
+                                model.search.owner = {};
+                                model.search.borrower = "book1@hot.gr";
+                                model.search.book = {};
+                                model.search.book.book = {};
+                                model.searchMode = true;
+                            }
+                            else/* if(model.singleSelect == 'by-book-title')*/{
+                                model.search.owner = {};
+                                model.search.borrower = {};
+                                model.search.book = {};
+                                model.search.book.book = {};
+                                model.searchMode = false;
+                                //model.search.book.book.title = '';
+                            }
+                        };
+                        model.getAllBorrowRequests(1);
+                        /*model.getMyBorrowRequests(1);*/
+                    }
+                    else{
+                        model.getAllBooks();
+                    }
+                }
+                else{
+                    if(model.view === 'friends' || model.view === 'friends-available' 
+                    || model.view === 'my_books' || model.view === 'my_book_requests'){
+                        $state.go('login');
+                    }
+                    else{
+                        model.getAllBooks();
+                    }
                 }
             }
 

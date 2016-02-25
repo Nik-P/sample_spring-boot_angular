@@ -1,7 +1,7 @@
 'use strict';
 
 	/* @ngInject */
-	function UserCtrl(UserService){
+	function UserCtrl(UserService, sessionService, $state){
 		var model = this;
 
 		function init() {
@@ -9,14 +9,23 @@
             //  writing any code outside of this function that executes immediately.
         	model.test = 'Ohh,this is a page for users <3';	
 
+            model.isLoggedIn = sessionService.isLoggedIn;
+
         	model.initUser = function() {
-        		model.getMyInfo(1);
+                if(model.isLoggedIn()){
+        		  model.userInfo = sessionService.getUserInfo();
+                  model.getMyInfo(model.userInfo);
+                  
+                }
+                else{
+                    $state.go('login');
+                }
         	};
 
-        	model.getMyInfo = function(id){
+            model.getMyInfo = function(id){
                 UserService.getAUser(id,
                 function(user){
-                    console.log('Retrieved Books');
+                    console.log('Retrieved User info');
                     model.user = user;
                 },
                 function(){
