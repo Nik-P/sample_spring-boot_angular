@@ -487,7 +487,7 @@ public class UserController {
         
         return new ResponseEntity<Object>(allRequests, new HttpHeaders(), HttpStatus.OK);
     }
-
+    
     @RequestMapping(method = RequestMethod.GET, value = "/{userId}/friend-requests")
     public ResponseEntity<?> getFriendRequests(@PathVariable Long userId , 
         @RequestParam(value = "limit", required=false, defaultValue = "10") int limit, 
@@ -503,6 +503,7 @@ public class UserController {
         return new ResponseEntity<Object>(friendRequests, new HttpHeaders(), HttpStatus.OK);
     }
     
+    
     @RequestMapping(method = RequestMethod.GET, value = "/{userId}/active-borrowed-books")
     public ResponseEntity<?> getListOfActiveBorrowedBooks(@PathVariable Long userId , 
         @RequestParam(value = "limit", required=false, defaultValue = "10") int limit, 
@@ -516,7 +517,7 @@ public class UserController {
         
         return new ResponseEntity<Object>(booksInCustody, new HttpHeaders(), HttpStatus.OK);
     }
-    
+        
     /*----------------------*/
     /*-----------    Private functions Segment    -----------*/
     /*----------------------*/

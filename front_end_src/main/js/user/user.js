@@ -7,7 +7,7 @@
 		function init() {
             // A definitive place to put everything that needs to run when the controller starts. Avoid
             //  writing any code outside of this function that executes immediately.
-        	model.test = 'Ohh,this is a page for users <3';	
+        	model.test = 'The userpage';	
 
             model.isLoggedIn = sessionService.isLoggedIn;
 
@@ -29,7 +29,7 @@
                     model.user = user;
                 },
                 function(){
-                    alert('Error retrieving friends books');
+                    alert('Error retrieving User info');
                 });
             };	
 

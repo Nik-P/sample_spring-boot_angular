@@ -42,7 +42,8 @@ angular.module('booksApp',
 	            $scope.pageTitle = toState.data.pageTitle + ' | Book' ;
 	        }
 	    });
-
+	    
+		//Is the user logged in?
 	    $scope.isLoggedIn = sessionService.isLoggedIn;
 
 		$scope.logout = function(){ 

@@ -9,11 +9,13 @@ import com.books.entity.helpers.StartEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -51,6 +53,11 @@ public class User extends StartEntity {
     private String password;
     @Size( min=8 )
     private String telephone;
+    
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(nullable=true/*, columnDefinition="mediumblob"*/)
+    private byte[] image;
     
     protected User(){
         

@@ -30,14 +30,13 @@ public interface BookRepo extends PagingAndSortingRepository<Book, Long> {
         + "(SELECT friendship.user FROM UserFriend friendship "
         + "INNER JOIN friendship.friend fr  WHERE fr.id = :id) ")
     Page<Book> findByUserFriends(Pageable p ,@Param("id") Long id);
-
-
+    
     @Query("SELECT ub FROM BookOfUser ub "
         + "WHERE ub.availability > 0 AND ub.user in "
         + "(SELECT friendship.user FROM UserFriend friendship "
         + "INNER JOIN friendship.friend fr  WHERE fr.id = :id) ")
     List<Object[]> findByUserFriendsWithAvailability(@Param("id") Long id);
-   
+    
     @Query("SELECT ub FROM BookOfUser ub "
         + "WHERE ub.availability > 0 AND ub.user in "
         + "(SELECT friendship.user FROM UserFriend friendship "

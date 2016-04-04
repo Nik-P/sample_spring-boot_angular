@@ -9,6 +9,7 @@
             //  writing any code outside of this function that executes immediately.
         	model.test = 'Check your notifications <3';	
 
+            //Is the user logged in?
             model.isLoggedIn = sessionService.isLoggedIn;
 
         	model.initUser = function() {

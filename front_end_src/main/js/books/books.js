@@ -7,7 +7,7 @@
 		function init() {
             // A definitive place to put everything that needs to run when the controller starts. Avoid
             //  writing any code outside of this function that executes immediately.
-        	model.test = 'All Books are good for you <3';
+        	model.test = 'The page for displaying book info';
         	
             model.view = $stateParams.view;
 
@@ -26,16 +26,23 @@
 
             model.initBooks = function(){
                 if(model.isLoggedIn()){
+                //If the user is logged in
                     if(model.view === 'friends'){
+                    //Get my friends books
                         model.getFriendsBooks(1);
                     }
                     else if(model.view === 'friends-available'){
+                    //Get my friends books that are available for lenting
                         model.getFriendsBooks(1);
                     }
                     else if(model.view === 'my_books'){
+                    //Get the logged user's books
                         model.getUserBooks(1);
                     }
                     else if(model.view === 'my_book_requests'){
+                    //Book lending requests from friends to me
+                    //or from me to friends
+
                         /* Select requests clause Init */
                         model.singleSelect = 'all';
                         /* Search model Init */
@@ -51,6 +58,7 @@
                         model.search.book.book = {};
                         model.filterRequest = function(){
                             if(model.singleSelect == 'all'){
+                                //Show all requests
                                 model.search.owner = {};
                                 model.search.borrower = {};
                                 model.search.book = {};
@@ -58,6 +66,7 @@
                                 model.searchMode = true;
                             }
                             else if(model.singleSelect == 'for-me'){
+                            //Show requests from my friends to me
                                 model.search.owner.email = "book1@hot.gr";
                                 model.search.borrower = {};
                                 model.search.book = {};
@@ -65,6 +74,7 @@
                                 model.searchMode = true;
                             }
                             else if(model.singleSelect == 'by-me'){
+                            //Show requests from me to my friends
                                 model.search.owner = {};
                                 model.search.borrower = "book1@hot.gr";
                                 model.search.book = {};
@@ -72,6 +82,7 @@
                                 model.searchMode = true;
                             }
                             else/* if(model.singleSelect == 'by-book-title')*/{
+                            //Search a specific request by book title
                                 model.search.owner = {};
                                 model.search.borrower = {};
                                 model.search.book = {};
@@ -80,14 +91,16 @@
                                 //model.search.book.book.title = '';
                             }
                         };
+                        //HTTP request for the lending requests
                         model.getAllBorrowRequests(1);
-                        /*model.getMyBorrowRequests(1);*/
                     }
                     else{
+                    //Get all the books
                         model.getAllBooks();
                     }
                 }
                 else{
+                //If the user is not logged in, restrict where he can go
                     if(model.view === 'friends' || model.view === 'friends-available' 
                     || model.view === 'my_books' || model.view === 'my_book_requests'){
                         $state.go('login');
@@ -101,11 +114,11 @@
             model.getUserBooks = function(id){
                 BookService.getUserBooks(id,
                 function(books){
-                    console.log('Retrieved Books');
+                    console.log('Retrieved user Books');
                     model.books = books;
                 },
                 function(){
-                    alert('Error retrieving friends books');
+                    alert('Error retrieving user books');
                 });
             };
 
@@ -145,7 +158,7 @@
             model.getFriendsBooks = function(id){
                 BookService.getFriendsBooks(id,
                 function(books){
-                    console.log('Retrieved Books');
+                    console.log('Retrieved Friends Books');
                     model.books = books;
                 },
                 function(){
@@ -156,7 +169,7 @@
         	model.getAllBooks = function(){
                 BookService.getAllBooks(
                 function(books){
-                    console.log('Retrieved Books');
+                    console.log('Retrieved all Books');
                     model.books = books;
                 },
                 function(){
