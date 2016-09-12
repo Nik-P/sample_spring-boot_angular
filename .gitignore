@@ -4,8 +4,6 @@
 /.gradle
 #Ignore sass compiling files
 /.sass-cache
-#ignore db folder files
-/db
 #Ignore build folder
 /build
 /build_2
